@@ -1,0 +1,41 @@
+<div *ngIf="data.type === 'delete'; else addOrEdit">
+  <h1 class="title">Are you sure you want to delete category {{selectedCategory$ | async}}?</h1>
+  <div mat-dialog-actions>
+    <button mat-button (click)="dialogRef.close()">No Thanks</button>
+    <button mat-button cdkFocusInitial (click)="deleteCategory()">Yes</button>
+  </div>
+</div>
+
+
+<ng-template #addOrEdit>
+  <h1 class="title">{{data.type}} category&nbsp;</h1>
+  <h1 *ngIf="data.type === 'edit'"> - {{selectedCategory$ | async}}</h1>
+  <div mat-dialog-content>
+    <form>
+      <mat-form-field class="full-width">
+        <mat-label>Category Name</mat-label>
+        <input matInput
+               [formControl]="nameFormControl">
+        <mat-error *ngIf="nameFormControl.hasError('required')">
+          Category name is <strong>required</strong>
+        </mat-error>
+        <mat-error *ngIf="nameFormControl.hasError('minlength')">
+          Category name is too short, length should be at least 3 characters
+        </mat-error>
+      </mat-form-field>
+    </form>
+
+  </div>
+  <div mat-dialog-actions>
+    <button mat-button (click)="dialogRef.close()">No Thanks</button>
+    <button mat-button
+            [disabled]="nameFormControl.invalid"
+            cdkFocusInitial
+            (click)="data.type === 'add' ? addNewCategory() : editCategory()">
+      Ok
+    </button>
+  </div>
+</ng-template>
+
+
+

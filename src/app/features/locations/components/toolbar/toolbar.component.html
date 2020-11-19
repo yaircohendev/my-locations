@@ -1,0 +1,25 @@
+<mat-toolbar color="primary">
+  <mat-toolbar-row class="toolbar-row">
+    <div class="titles-container">
+      <span>MyList - </span><span class="location-title">{{selectedCategory || 'Main'}}</span>
+    </div>
+    <div class="icons">
+      <mat-icon class="icon"
+                (click)="openDialog.emit('add')"
+                matTooltip="Add new category">add
+      </mat-icon>
+      <mat-icon class="icon"
+                matTooltip="Edit category"
+                (click)="openDialog.emit('edit')"
+                *ngIf="selectedCategory">
+        create
+      </mat-icon>
+      <mat-icon class="icon"
+                matTooltip="Delete category"
+                (click)="openDialog.emit('delete')"
+                *ngIf="selectedCategory">
+        delete
+      </mat-icon>
+    </div>
+  </mat-toolbar-row>
+</mat-toolbar>

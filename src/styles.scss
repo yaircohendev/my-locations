@@ -1,0 +1,35 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background-image: radial-gradient(
+    circle 993px at 0.5% 50.5%,
+    rgba(137, 171, 245, 0.37) 0%,
+    rgba(245, 247, 252, 1) 100.2%
+  );
+  width: 100vw;
+  height: 100vh;
+}
+
+:root {
+  mat-icon {
+    cursor: pointer;
+    &:hover {
+      opacity: .8;
+    }
+  }
+}
+
+.full-width {
+  width: 100%;
+}

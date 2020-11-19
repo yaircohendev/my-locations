@@ -1,0 +1,14 @@
+.toolbar-row {
+  justify-content: space-between;
+
+  .titles-container {
+    overflow:hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    .location-title {
+      font-size: 1.1rem;
+      font-weight: normal;
+    }
+  }
+}

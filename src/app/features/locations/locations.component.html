@@ -1,0 +1,27 @@
+<div class="container">
+  <h1 class="main-title">Manage Your Locations</h1>
+
+  <mat-card class="my-locations">
+    <app-toolbar
+      (openDialog)="openDialog($event)"
+      [selectedCategory]="selectedCategory$ | async">
+    </app-toolbar>
+
+    <div class="content" *ngIf="(categories$ | async)?.length; else noData">
+      <app-select-category
+        (updateSelectedCategory)="updateSelectedCategory($event)"
+        [selectedCategory]="selectedCategory$ | async"
+        [categories]="categories$ | async">
+      </app-select-category>
+<!--      <mat-card>Category list item will be here</mat-card>-->
+    </div>
+    <ng-template #noData>
+       <div class="no-data">
+         <h2>No categories are available, click the plus icon in the right of the toolbar to add a new category</h2>
+       </div>
+    </ng-template>
+    
+  </mat-card>
+</div>
+
+

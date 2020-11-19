@@ -1,0 +1,10 @@
+<mat-form-field appearance="fill" class="categories-select">
+  <mat-label>Category</mat-label>
+  <mat-select [value]="selectedCategory"
+              (selectionChange)="updateSelectedCategory.emit($event)">
+    <mat-option *ngFor="let category of categories"
+                [value]="category">
+      {{category}}
+    </mat-option>
+  </mat-select>
+</mat-form-field>
