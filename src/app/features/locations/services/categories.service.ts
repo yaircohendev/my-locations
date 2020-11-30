@@ -1,27 +1,16 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { SnackBarService } from '../../../core/services/snackbar.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CategoriesService {
-  constructor(private snackBar: SnackBarService) {}
+  constructor() {}
 
-  addNewCategory(category: string): Observable<string> {
+  postCategories(categories: string[]): Observable<string> {
     return new Observable((observer) => {
-      const categories =
-        JSON.parse(localStorage.getItem('categories') as string) || [];
-      const alreadyExists = categories.some((c: string) => c === category);
-      if (!alreadyExists) {
-        categories.push(category);
-        localStorage.setItem('categories', JSON.stringify(categories));
-        observer.next(category);
-      } else {
-        const error = 'Category already exists';
-        this.snackBar.showSnackBar(error);
-        observer.error(error);
-      }
+      localStorage.setItem('categories', JSON.stringify(categories));
+      observer.next('success');
       observer.complete();
     });
   }
@@ -43,32 +32,10 @@ export class CategoriesService {
     });
   }
 
-  updateCategory(oldVal: string, newVal: string): Observable<string[]> {
-    return new Observable((observer) => {
-      let categories = JSON.parse(localStorage.getItem('categories') as string);
-      categories = categories.map((c: string) =>
-        c === oldVal ? newVal : oldVal
-      );
-      localStorage.setItem('categories', JSON.stringify(categories));
-      observer.next(categories);
-      observer.complete();
-    });
-  }
-
   updateSelectedCategory(selectedCategory: string): Observable<string> {
     return new Observable((observer) => {
       localStorage.setItem('selectedCategory', selectedCategory);
       observer.next(selectedCategory);
-      observer.complete();
-    });
-  }
-
-  deleteCategory(category: string): Observable<string[]> {
-    return new Observable((observer) => {
-      let categories = JSON.parse(localStorage.getItem('categories') as string);
-      categories = categories.filter((c: string) => c !== category);
-      localStorage.setItem('categories', JSON.stringify(categories));
-      observer.next(categories);
       observer.complete();
     });
   }

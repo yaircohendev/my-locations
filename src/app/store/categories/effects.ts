@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Actions, Effect, ofType } from '@ngrx/effects';
-import { switchMap, tap } from 'rxjs/operators';
-import { Store } from '@ngrx/store';
+import { switchMap, tap, withLatestFrom } from 'rxjs/operators';
+import { select, Store } from '@ngrx/store';
 import * as CategoriesActions from './actions';
 import {
   addCategories,
@@ -13,20 +13,34 @@ import {
 import { CategoriesService } from '../../features/locations/services/categories.service';
 import { AppState } from '../index';
 import { SnackBarService } from '../../core/services/snackbar.service';
+import { selectAllCategories } from './selectors';
+import { of } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class CategoriesEffects {
   @Effect({ dispatch: false }) addCategory$ = this.actions$.pipe(
     ofType(CategoriesActions.beginAddCategory),
-    switchMap((action) =>
-      this.categoriesService.addNewCategory(action.payload).pipe(
-        tap((value) => {
-          this.store.dispatch(addCategory({ payload: value }));
-          this.store.dispatch(beginUpdateSelectedCategory({ payload: value }));
+    withLatestFrom(this.store.pipe(select(selectAllCategories))),
+    switchMap(([action, categories]) => {
+      const updatedCategories = [...categories];
+      const category = action.payload;
+      const alreadyExists = categories.some((c: string) => c === category);
+      if (!alreadyExists) {
+        updatedCategories.push(category);
+      } else {
+        this.snackBar.showSnackBar('Category already exists');
+        return of(false);
+      }
+      return this.categoriesService.postCategories(updatedCategories).pipe(
+        tap(() => {
+          this.store.dispatch(addCategory({ payload: category }));
+          this.store.dispatch(
+            beginUpdateSelectedCategory({ payload: category })
+          );
           this.snackBarService.showSnackBar('Category added successfully');
         })
-      )
-    )
+      );
+    })
   );
 
   @Effect({ dispatch: false }) loadCategories$ = this.actions$.pipe(
@@ -55,16 +69,20 @@ export class CategoriesEffects {
 
   @Effect({ dispatch: false }) updateCategory$ = this.actions$.pipe(
     ofType(CategoriesActions.beginUpdateCategory),
-    switchMap((action) =>
-      this.categoriesService.updateCategory(action.oldVal, action.newVal).pipe(
-        tap((categories) => {
-          this.store.dispatch(updateCategories({ payload: categories }));
+    withLatestFrom(this.store.pipe(select(selectAllCategories))),
+    switchMap(([action, categories]) => {
+      const updatedCategories = categories.map((c: string) =>
+        c === action.oldVal ? action.newVal : action.oldVal
+      );
+      return this.categoriesService.postCategories(updatedCategories).pipe(
+        tap(() => {
+          this.store.dispatch(updateCategories({ payload: updatedCategories }));
           this.store.dispatch(
             beginUpdateSelectedCategory({ payload: action.newVal })
           );
         })
-      )
-    )
+      );
+    })
   );
 
   @Effect({ dispatch: false })
@@ -83,20 +101,25 @@ export class CategoriesEffects {
 
   @Effect({ dispatch: false }) deleteCategory$ = this.actions$.pipe(
     ofType(CategoriesActions.deleteCategory),
-    switchMap((action) =>
-      this.categoriesService.deleteCategory(action.payload).pipe(
-        tap((categories) => {
-          this.store.dispatch(updateCategories({ payload: categories }));
+    withLatestFrom(this.store.pipe(select(selectAllCategories))),
+    switchMap(([action, categories]) => {
+      const updatedCategories = categories.filter(
+        (c: string) => c !== action.payload
+      );
+      return this.categoriesService.postCategories(updatedCategories).pipe(
+        tap(() => {
+          this.store.dispatch(updateCategories({ payload: updatedCategories }));
           this.store.dispatch(beginUpdateSelectedCategory({ payload: '' }));
         })
-      )
-    )
+      );
+    })
   );
 
   constructor(
     private actions$: Actions,
     private store: Store<AppState>,
     private categoriesService: CategoriesService,
-    private snackBarService: SnackBarService
+    private snackBarService: SnackBarService,
+    private snackBar: SnackBarService
   ) {}
 }
